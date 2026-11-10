@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 const QUESTIONS = [
   {
@@ -177,7 +177,7 @@ const PURPOSE_LINES = {
 };
 
 export default function App() {
-  const [screen, setScreen] = useState('landing'); // landing, quiz, transition, contact, result, privacy
+  const [screen, setScreen] = useState('landing');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState({});
   const [selectedOption, setSelectedOption] = useState(null);
@@ -203,7 +203,6 @@ export default function App() {
     setAnswers(newAnswers);
     setSelectedOption(null);
 
-    // Check if we hit the transition screen condition after w2 (index 1)
     if (currentIndex === 1) {
       setScreen('transition');
       return;
@@ -212,7 +211,6 @@ export default function App() {
     if (currentIndex < QUESTIONS.length - 1) {
       setCurrentIndex(currentIndex + 1);
     } else {
-      // Calculate result
       calculateResult(newAnswers);
       setScreen('contact');
     }
@@ -246,10 +244,9 @@ export default function App() {
       }
     });
 
-    // Determine winner with tie-breaking: d > c > b > a > e
     let maxScore = -1;
     let winner = 'explorer';
-    const order = ['explorer', 'storyteller', 'builder', 'refiner', 'launcher']; // reverse so later overwrites earlier or check explicit priority
+    const order = ['explorer', 'storyteller', 'builder', 'refiner', 'launcher'];
 
     order.forEach(slug => {
       if (counts[slug] >= maxScore) {
@@ -263,7 +260,7 @@ export default function App() {
 
   const handleTransitionContinue = () => {
     setScreen('quiz');
-    setCurrentIndex(2); // Move to Q1 (Scored 1)
+    setCurrentIndex(2);
     setSelectedOption(answers[QUESTIONS[2].id] || null);
   };
 
@@ -324,7 +321,7 @@ export default function App() {
 
         <main style={{ maxWidth: '560px', margin: '0 auto', padding: '24px 20px' }}>
           {screen === 'landing' && (
-            <div style={{ textAlign: 'left', animation: 'fadeIn 0.3s ease' }}>
+            <div style={{ textAlign: 'left' }}>
               <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#AA2337', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '16px' }}>
                 FOR LEADERS WITH A STORY
               </div>
@@ -344,257 +341,4 @@ export default function App() {
                 fontSize: '18px',
                 fontWeight: 'bold',
                 cursor: 'pointer',
-                boxShadow: '0 4px 12px rgba(170, 35, 55, 0.2)'
-              }}>
-                Start the quiz
-              </button>
-              <div style={{ textAlign: 'center', fontSize: '14px', marginTop: '12px', opacity: 0.7 }}>
-                Takes about 3 minutes.
-              </div>
-            </div>
-          )}
-
-          {screen === 'quiz' && (() => {
-            const currentQ = QUESTIONS[currentIndex];
-            return (
-              <div style={{ animation: 'fadeIn 0.3s ease' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-                  <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#AA2337', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
-                    {currentQ.title}
-                  </div>
-                  {currentIndex > 0 && (
-                    <button onClick={handleBack} style={{ background: 'none', border: 'none', color: '#333335', fontSize: '14px', cursor: 'pointer', opacity: 0.7 }}>
-                      ← Back
-                    </button>
-                  )}
-                </div>
-                <h2 style={{ fontSize: '24px', fontWeight: '700', lineHeight: '1.25', marginBottom: '24px', color: '#333335' }}>
-                  {currentQ.subtitle}
-                </h2>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '32px' }}>
-                  {currentQ.options.map((opt, i) => {
-                    const val = opt.val || opt.score || opt.label;
-                    const isSelected = selectedOption === val;
-                    return (
-                      <div
-                        key={i}
-                        onClick={() => handleSelect(val)}
-                        style={{
-                          backgroundColor: '#FFFFFF',
-                          border: isSelected ? '2px solid #AA2337' : '1px solid rgba(51, 51, 53, 0.25)',
-                          borderRadius: '12px',
-                          padding: '18px 20px',
-                          fontSize: '18px',
-                          fontWeight: '500',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'space-between',
-                          transition: 'all 0.2s ease',
-                          boxShadow: isSelected ? '0 2px 8px rgba(170, 35, 55, 0.1)' : 'none'
-                        }}
-                      >
-                        <span>{opt.label}</span>
-                        {isSelected && <span style={{ color: '#AA2337', fontWeight: 'bold' }}>✓</span>}
-                      </div>
-                    );
-                  })}
-                </div>
-                <button
-                  onClick={handleNext}
-                  disabled={!selectedOption}
-                  style={{
-                    width: '100%',
-                    backgroundColor: selectedOption ? '#AA2337' : '#cccccc',
-                    color: '#F8F6F6',
-                    border: 'none',
-                    borderRadius: '12px',
-                    padding: '18px',
-                    fontSize: '18px',
-                    fontWeight: 'bold',
-                    cursor: selectedOption ? 'pointer' : 'not-allowed',
-                    opacity: selectedOption ? 1 : 0.6
-                  }}
-                >
-                  Continue
-                </button>
-              </div>
-            );
-          })()}
-
-          {screen === 'transition' && (
-            <div style={{ textAlign: 'center', padding: '40px 0', animation: 'fadeIn 0.3s ease' }}>
-              <button onClick={handleBack} style={{ background: 'none', border: 'none', color: '#333335', fontSize: '14px', cursor: 'pointer', opacity: 0.7, marginBottom: '20px', float: 'left' }}>
-                ← Back
-              </button>
-              <p style={{ fontSize: '22px', lineHeight: '1.5', color: '#333335', marginBottom: '40px', fontWeight: '500', clear: 'both' }}>
-                A book answers the same questions for you in every room, for years, while you get on with your day. Let\'s see where yours stands.
-              </p>
-              <button onClick={handleTransitionContinue} style={{
-                width: '100%',
-                backgroundColor: '#AA2337',
-                color: '#F8F6F6',
-                border: 'none',
-                borderRadius: '12px',
-                padding: '18px',
-                fontSize: '18px',
-                fontWeight: 'bold',
-                cursor: 'pointer'
-              }}>
-                Continue
-              </button>
-            </div>
-          )}
-
-          {screen === 'contact' && (
-            <div style={{ animation: 'fadeIn 0.3s ease' }}>
-              <button onClick={() => setScreen('quiz')} style={{ background: 'none', border: 'none', color: '#333335', fontSize: '14px', cursor: 'pointer', opacity: 0.7, marginBottom: '12px' }}>
-                ← Back
-              </button>
-              <h2 style={{ fontSize: '28px', fontWeight: '800', marginBottom: '8px' }}>Your result is ready.</h2>
-              <p style={{ fontSize: '16px', opacity: '0.8', marginBottom: '24px' }}>Where should we send your copy?</p>
-
-              <form onSubmit={handleSubmitContact} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>First name *</label>
-                  <input
-                    type="text"
-                    value={contact.firstName}
-                    onChange={e => setContact({ ...contact, firstName: e.target.value })}
-                    placeholder="Enter your first name"
-                    style={{ width: '100%', height: '56px', padding: '0 16px', borderRadius: '12px', border: errors.firstName ? '2px solid #AA2337' : '1px solid rgba(51,51,53,0.4)', fontSize: '16px', boxSizing: 'border-box', backgroundColor: '#fff' }}
-                  />
-                  {errors.firstName && <span style={{ color: '#AA2337', fontSize: '13px', marginTop: '4px', display: 'block' }}>{errors.firstName}</span>}
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>Email address *</label>
-                  <input
-                    type="email5"
-                    value={contact.email}
-                    onChange={e => setContact({ ...contact, email: e.target.value })}
-                    placeholder="you@example.com"
-                    style={{ width: '100%', height: '56px', padding: '0 16px', borderRadius: '12px', border: errors.email ? '2px solid #AA2337' : '1px solid rgba(51,51,53,0.4)', fontSize: '16px', boxSizing: 'border-box', backgroundColor: '#fff' }}
-                  />
-                  {errors.email && <span style={{ color: '#AA2337', fontSize: '13px', marginTop: '4px', display: 'block' }}>{errors.email}</span>}
-                </div>
-
-                <div>
-                  <label style={{ display: 'block', fontSize: '14px', fontWeight: '600', marginBottom: '8px' }}>WhatsApp number *</label>
-                  <input
-                    type="text"
-                    value={contact.whatsapp}
-                    onChange={e => setContact({ ...contact, whatsapp: e.target.value })}
-                    placeholder="+234 801 234 5678"
-                    style={{ width: '100%', height: '56px', padding: '0 16px', borderRadius: '12px', border: errors.whatsapp ? '2px solid #AA2337' : '1px solid rgba(51,51,53,0.4)', fontSize: '16px', boxSizing: 'border-box', backgroundColor: '#fff' }}
-                  />
-                  <span style={{ fontSize: '13px', opacity: 0.7, marginTop: '4px', display: 'block' }}>Add your country code, for example +234. We use it to send your next step.</span>
-                  {errors.whatsapp && <span style={{ color: '#AA2337', fontSize: '13px', marginTop: '4px', display: 'block' }}>{errors.whatsapp}</span>}
-                </div>
-
-                <div style={{ fontSize: '13px', opacity: 0.7, lineHeight: '1.4' }}>
-                  By continuing, you agree that Elegraph Publishing may send you your result and follow up with you on WhatsApp and email. You can ask us to stop at any time. Read our <span onClick={() => setScreen('privacy')} style={{ color: '#AA2337', cursor: 'pointer', textDecoration: 'underline' }}>Privacy page</span>.
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  style={{
-                    width: '100%',
-                    backgroundColor: '#AA2337',
-                    color: '#F8F6F6',
-                    border: 'none',
-                    borderRadius: '12px',
-                    padding: '18px',
-                    fontSize: '18px',
-                    fontWeight: 'bold',
-                    cursor: submitting ? 'not-allowed' : 'pointer'
-                  }}
-                >
-                  {submitting ? 'Working out your result...' : 'Show me my result'}
-                </button>
-              </form>
-            </div>
-          )}
-
-          {screen === 'result' && (() => {
-            const res = RESULTS_DATA[resultSlug];
-            const purposeKey = answers['purpose'];
-            const purposeLine = PURPOSE_LINES[purposeKey] || PURPOSE_LINES['authority'];
-            const waLink = `https://wa.me/2347047334979?text=${encodeURIComponent(res.waMessage)}`;
-
-            return (
-              <div style={{ animation: 'fadeIn 0.3s ease' }}>
-                <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#AA2337', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '8px' }}>
-                  YOUR RESULT
-                </div>
-                <h1 style={{ fontFamily: 'Georgia, serif', fontSize: '38px', fontWeight: '800', lineHeight: '1.1', marginBottom: '24px' }}>
-                  {res.name}
-                </h1>
-
-                <div style={{ marginBottom: '24px' }}>
-                  <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#AA2337', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '6px' }}>WHAT THIS MEANS</div>
-                  <p style={{ fontSize: '17px', lineHeight: '1.55', margin: 0 }}>{res.meaning}</p>
-                </div>
-
-                <div style={{ marginBottom: '24px' }}>
-                  <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#AA2337', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '6px' }}>WHAT TO DO NEXT</div>
-                  <p style={{ fontSize: '17px', lineHeight: '1.55', margin: 0 }}>{res.nextStep}</p>
-                </div>
-
-                <div style={{ marginBottom: '32px' }}>
-                  <div style={{ fontSize: '12px', fontWeight: 'bold', color: '#AA2337', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '6px' }}>HOW WE HELP</div>
-                  <p style={{ fontSize: '17px', lineHeight: '1.55', marginBottom: '12px' }}>{res.howWeHelp}</p>
-                  <p style={{ fontFamily: \'Playfair Display\', fontStyle: 'italic', fontSize: '20px', lineHeight: '1.4', color: '#AA2337', margin: 0 }}>
-                    "{purposeLine}"
-                  </p>
-                </div>
-
-                <div style={{ backgroundColor: '#fff', borderRadius: '16px', padding: '24px', border: '1px solid rgba(51,51,53,0.15)', textAlign: 'center' }}>
-                  <p style={{ fontSize: '16px', fontWeight: '500', marginBottom: '20px' }}>{res.closing}</p>
-                  <a
-                    href={waLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: 'block',
-                      width: '100%',
-                      backgroundColor: '#25D366',
-                      color: '#FFFFFF',
-                      textDecoration: 'none',
-                      borderRadius: '12px',
-                      padding: '18px',
-                      fontSize: '18px',
-                      fontWeight: 'bold',
-                      boxSizing: 'border-box',
-                      boxShadow: '0 4px 12px rgba(37, 211, 102, 0.3)'
-                    }}
-                  >
-                    {resultSlug === 'explorer' ? 'Get your short read on WhatsApp' : 'Message us on WhatsApp'}
-                  </a>
-                </div>
-              </div>
-            );
-          })()}
-
-          {screen === 'privacy' && (
-            <div style={{ animation: 'fadeIn 0.3s ease' }}>
-              <button onClick={() => setScreen('landing')} style={{ background: 'none', border: 'none', color: '#333335', fontSize: '14px', cursor: 'pointer', opacity: 0.7, marginBottom: '20px' }}>
-                ← Home
-              </button>
-              <h1 style={{ fontSize: '28px', fontWeight: '800', marginBottom: '16px' }}>Privacy Policy</h1>
-              <p style={{ fontSize: '16px', lineHeight: '1.6', marginBottom: '16px' }}>
-                At Elegraph Publishing, we respect your privacy and protect your personal information. When you take our Book Readiness Quiz, we collect your name, email address, and WhatsApp number solely to deliver your personalized quiz result and facilitate relevant publishing consultations.
-              </p>
-              <p style={{ fontSize: '16px', lineHeight: '1.6', marginBottom: '16px' }}>
-                We never sell or share your data with third parties. You may request deletion or access to your information at any time by contacting us directly.
-              </p>
-            </div>
-          )}
-        </main>
-      </div>
-
-      {renderFooter()}
-    </div>
-  );
-      }
+                boxShadow: '0 4px 
